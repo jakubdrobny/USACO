@@ -56,47 +56,34 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
+int main() {
+    setIO();
 
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
+    int N, ans = 0; cin >> N;
+    vvi adj(3000, vi(3000)), vis(3000, vi(3000));
 
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
+    function<void(int, int)> add = [&](int x, int y) {
+        if (!vis[x][y]) {
+            vis[x][y] = 1;
+            ans++;
+            if (vis[x][y] && adj[x][y] == 3) FOR(ind,0,4) add(x + dx[ind], y + dy[ind]);
+            FOR(ind,0,4) {
+                int xx = x + dx[ind], yy = y + dy[ind];
+                adj[xx][yy]++;
+                if (vis[xx][yy] && adj[xx][yy] == 3) {
+                    FOR(ind2,0,4) add(xx + dx[ind2], yy + dy[ind2]);
                 }
             }
         }
+    };
+
+    FOR(i,0,N) {
+        int x, y; cin >> x >> y;
+        x += 1000, y += 1000;
+        ans--;
+        add(x, y);
+        cout << ans << "\n";
     }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
-int main() {
-    setIO("lightson");
-
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
-
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
-
-    lit[1][1] = 1;
-    dfs(1, 1);
-
-    cout << ans << "\n";
 
     return 0;
 }

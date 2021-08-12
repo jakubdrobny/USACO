@@ -56,47 +56,22 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
-
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    int N; cin >> N;
+    vi a(N); FOR(i,0,N) cin >> a[i];
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
+    int e = 0, o = 0;
+    FOR(i,0,N) {
+        if (a[i] & 1) o++;
+        else e++;
     }
 
-    lit[1][1] = 1;
-    dfs(1, 1);
-
-    cout << ans << "\n";
+    while (o > e) o -= 2, e++;
+    if (e > o + 1) e = o + 1;
+    
+    cout << e + o << "\n";
 
     return 0;
 }

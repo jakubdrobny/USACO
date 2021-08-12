@@ -56,47 +56,32 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
-
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    manytests {
+        string s; cin >> s;
+        int N = sz(s);
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
+        int x = 0, y = 0;
+        vpi pos; pos.pb({x, y});
+
+        FOR(i,0,N) {
+            if (s[i] == 'N') y++;
+            else if (s[i] == 'S') y--;
+            else if (s[i] == 'E') x++;
+            else x--;
+
+            pos.pb({x, y});
+        }
+
+        int ar = 0;
+
+        FOR(i,1,N+1) ar += (pos[i+1].fi - pos[i].fi) * (pos[i].se + pos[i+1].se);
+
+        if (ar >= 0) cout << "CW\n";
+        else cout << "CCW\n";
     }
-
-    lit[1][1] = 1;
-    dfs(1, 1);
-
-    cout << ans << "\n";
 
     return 0;
 }

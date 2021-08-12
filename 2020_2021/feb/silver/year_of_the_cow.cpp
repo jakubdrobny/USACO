@@ -48,55 +48,32 @@ double PI = atan(1) * 4;
 #define vpld vector<pld>
 
 inline namespace FileIO {
-    void setIn(str s) { freopen(s.c_str(), "r", stdin); }
-	void setOut(str s) { freopen(s.c_str(), "w", stdout); }
-	void setIO(str s = "") {
+    void setIn(string s) { freopen(s.c_str(), "r", stdin); }
+	void setOut(string s) { freopen(s.c_str(), "w", stdout); }
+	void setIO(string s = "") {
 		cin.tie(0)->sync_with_stdio(0);
 		if (sz(s)) setIn(s+".in"), setOut(s+".out");
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
-
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
+set<int> blocks;
+vi gaps;
 
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
-
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
-
-    lit[1][1] = 1;
-    dfs(1, 1);
-
-    cout << ans << "\n";
+    int N, K, years_ago, ans, last = 0;
+	cin >> N >> K;
+	FOR(i,0,N) { cin >> years_ago; blocks.insert((years_ago + 11) / 12); }
+	ans = *blocks.rbegin();
+	while (!blocks.empty()) {
+		gaps.pb(*blocks.begin() - last - 1);
+		last = *blocks.begin();
+		blocks.erase(*blocks.begin());
+	}
+	sort(rall(gaps));
+	for (int i = 0; i < K - 1 && i < sz(gaps); i++) ans -= gaps[i];
+	cout << ans * 12 << "\n";
 
     return 0;
 }

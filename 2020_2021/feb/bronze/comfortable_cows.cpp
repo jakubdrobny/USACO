@@ -56,47 +56,36 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
+const int mxn = 3005;
+vvi pasture(mxn, vi(mxn));
 
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
+int neigh_count(int x, int y) {
+    if (!pasture[x][y]) return 0;
+    int res = 0;
+    FOR(i,0,4) res += pasture[x + dx[i]][y + dy[i]];
+    return res;
 }
 
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    int N, cnt = 0; cin >> N;
+    
+    FOR(i,0,N) {
+        int x, y; cin >> x >> y;
+        x += 1000, y += 1000;
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
+        FOR(ind,0,4) {
+            int nc = neigh_count(x + dx[ind], y + dy[ind]);
+            if (nc == 3) cnt--;
+            else if (nc == 2) cnt++;
+        }
+
+        cnt += neigh_count(x, y) == 3;
+        pasture[x][y] = 1;
+
+        cout << cnt << "\n";
     }
-
-    lit[1][1] = 1;
-    dfs(1, 1);
-
-    cout << ans << "\n";
 
     return 0;
 }

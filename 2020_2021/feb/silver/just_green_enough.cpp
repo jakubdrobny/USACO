@@ -48,55 +48,48 @@ double PI = atan(1) * 4;
 #define vpld vector<pld>
 
 inline namespace FileIO {
-    void setIn(str s) { freopen(s.c_str(), "r", stdin); }
-	void setOut(str s) { freopen(s.c_str(), "w", stdout); }
-	void setIO(str s = "") {
+    void setIn(string s) { freopen(s.c_str(), "r", stdin); }
+	void setOut(string s) { freopen(s.c_str(), "w", stdout); }
+	void setIO(string s = "") {
 		cin.tie(0)->sync_with_stdio(0);
 		if (sz(s)) setIn(s+".in"), setOut(s+".out");
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
+const int mxn = 1005;
+int N;
+bool ok[mxn][mxn];
 
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
+ll solve() {
+    ll ans = 0;
+    FOR(i,0,N) {
+        vb all_ones(N, true);
+        FOR(j,i,N) {
+            int run = 0;
+            FOR(k,0,N) {
+                all_ones[k] = all_ones[k] & ok[j][k];
+                if (all_ones[k]) ans += ++run;
+                else run = 0;
             }
         }
     }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
+    return ans;
 }
 
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    cin >> N;
+    vvi pasture(N, vi(N));
+    FOR(i,0,N) FOR(j,0,N) cin >> pasture[i][j];
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
+    FOR(i,0,N) FOR(j,0,N) ok[i][j] = pasture[i][j] >= 100;
 
-    lit[1][1] = 1;
-    dfs(1, 1);
+    ll ans = solve();
 
-    cout << ans << "\n";
+    FOR(i,0,N) FOR(j,0,N) ok[i][j] = pasture[i][j] > 100;
+
+    cout << ans - solve() << "\n";
 
     return 0;
 }

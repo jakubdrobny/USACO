@@ -26,7 +26,6 @@ double PI = atan(1) * 4;
 
 #define ll long long
 #define ld long double
-#define str string
 #define fi first
 #define se second
 #define rev reverse
@@ -47,54 +46,29 @@ double PI = atan(1) * 4;
 #define vpl vector<pl>
 #define vpld vector<pld>
 
-inline namespace FileIO {
-    void setIn(str s) { freopen(s.c_str(), "r", stdin); }
-	void setOut(str s) { freopen(s.c_str(), "w", stdout); }
-	void setIO(str s = "") {
-		cin.tie(0)->sync_with_stdio(0);
-		if (sz(s)) setIn(s+".in"), setOut(s+".out");
-	}
-}
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);    
+   
+    int N; cin >> N;
+    vi g(N+1);
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
+    FOR(i,0,N-1) {
+        int x, y; cin >> x >> y;
+        g[x]++, g[y]++;
+    }
 
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
+    int ans = N - 1;
 
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
+    FOR(i,1,N+1) {
+        if (g[i] > 1 || i == 1) {
+            int kids = g[i];
+            if (i > 1) kids--;
+            int lg = 0, pw = 1;
+            while (pw < kids + 1) pw <<= 1, lg++;
+            ans += lg;
         }
     }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
-int main() {
-    setIO("lightson");
-
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
-
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
-
-    lit[1][1] = 1;
-    dfs(1, 1);
 
     cout << ans << "\n";
 

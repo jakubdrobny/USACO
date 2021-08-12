@@ -56,47 +56,47 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
-
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    int N, K; cin >> N >> K;
+	vi cows(N+1);
+	vvi pos(N+1);
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
+	FOR(i,1,N+1) {
+		cows[i] = i;
+		pos[i].pb(i);
+	}
 
-    lit[1][1] = 1;
-    dfs(1, 1);
+	FOR(t,1,K+1) {
+		int a, b; cin >> a >> b;
+		swap(cows[a], cows[b]);
+		pos[cows[a]].pb(a);
+		pos[cows[b]].pb(b);
+	}
 
-    cout << ans << "\n";
+	vi ans(N+1);
+
+	FOR(r,1,N+1) {
+		if (cows[r] != 0) {
+			vi cycle;
+
+			int j = r;
+			while (cows[j] != 0) {
+				cycle.pb(j);
+				j = cows[j];
+				cows[cycle.back()] = 0;
+			}
+
+			set<int> vis;
+			for (int cow : cycle) {
+				for (int p : pos[cow]) vis.insert(p);
+			}
+			
+			for (int cow : cycle) ans[cow] = sz(vis);
+		}
+	}
+	FOR(i,1,N+1) cout << ans[i] << "\n";
 
     return 0;
 }

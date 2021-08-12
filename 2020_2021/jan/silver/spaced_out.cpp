@@ -56,47 +56,27 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
-
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    int N; cin >> N;
+	vvi g(N, vi(N)); FOR(i,0,N) FOR(j,0,N) cin >> g[i][j];
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
+	ll hans = 0, vans = 0;
 
-    lit[1][1] = 1;
-    dfs(1, 1);
+	FOR(i,0,N) {
+		vl ans(2);
+		FOR(j,0,N) ans[j & 1] += g[i][j];
+		hans += max(ans[0], ans[1]);
+	}
 
-    cout << ans << "\n";
+	FOR(j,0,N) {
+		vl ans(2);
+		FOR(i,0,N) ans[i & 1] += g[i][j];
+		vans += max(ans[0], ans[1]);
+	}
+
+	cout << max(hans, vans) << "\n";
 
     return 0;
 }

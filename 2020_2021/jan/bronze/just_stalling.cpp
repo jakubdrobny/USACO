@@ -56,45 +56,22 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
-
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
-
-    vis[x][y] = 1;
-
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
-}
-
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    // O(n log n) solution with two pointers
+    int N; cin >> N;
+    vi a(N), b(N); FOR(i,0,N) cin >> a[i]; FOR(i,0,N) cin >> b[i];
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
+    sort(all(a)), sort(all(b));
+
+    ll ans = 1;
+    int j = 0;
+
+    FOR(i,0,N) {
+        while (j < N && b[j] < a[i]) j++;
+        ans *= 1LL * ((N - j) - (N - 1 - i));
     }
-
-    lit[1][1] = 1;
-    dfs(1, 1);
 
     cout << ans << "\n";
 

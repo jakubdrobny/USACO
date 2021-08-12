@@ -56,47 +56,38 @@ inline namespace FileIO {
 	}
 }
 
-const int mxn = 105;
-int N, M, ans = 1, vis[mxn][mxn], lit[mxn][mxn];
-vector<vector<vpi>> g;
+int N, Q;
+string S;
 
-void dfs(int x, int y) {
-    if (x <= 0 || y <= 0 || x > N || y > N || !lit[x][y] || vis[x][y]) return;
+vi build() {
+	vi ans(N+1);
+	stack<char> st;
 
-    vis[x][y] = 1;
+	FOR(i,0,N) {
+		ans[i+1] = ans[i];
+		while (!st.empty() && st.top() > S[i]) st.pop();
+		if (st.empty() || st.top() < S[i]) {
+			st.push(S[i]);
+			ans[i+1]++;
+		}
+	}
 
-    if (sz(g[x][y])) {
-        for (auto [nx, ny]: g[x][y]) {
-            if (!lit[nx][ny]) {
-                lit[nx][ny] = 1;
-                ans++;
-                FOR(ind,0,4) {
-                    if (nx + dx[ind] > N || nx + dx[ind] <= 0) continue;
-                    if (ny + dy[ind] > N || ny + dy[ind] <= 0) continue;
-                    if (vis[nx + dx[ind]][ny + dy[ind]]) dfs(nx, ny);
-                }
-            }
-        }
-    }
-
-    FOR(ind,0,4) dfs(x + dx[ind], y + dy[ind]);
+	return ans;
 }
 
 int main() {
-    setIO("lightson");
+    setIO();
 
-    cin >> N >> M;
-    g.assign(N+1, vector<vpi>(N+1));
+    cin >> N >> Q >> S;
 
-    FOR(i,0,M) {
-        int x, y, a, b; cin >> x >> y >> a >> b;
-        g[x][y].pb({a, b});
-    }
+	vi pre = build();
+	rev(all(S));
+	vi suf = build();
 
-    lit[1][1] = 1;
-    dfs(1, 1);
-
-    cout << ans << "\n";
+	while (Q--) {
+		int a, b; cin >> a >> b;
+		cout << pre[a - 1] + suf[N - b] << "\n";
+	}
 
     return 0;
 }
